@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    <style>
+      html,
+      body {
+        overflow: hidden;
+        margin: 0;
+      }
+
+      img {
+        width: 100%;
+        max-width: 160px;
+      }
+
+      @media (min-width: 50rem) {
+        img {
+          max-width: 300px;
+        }
+      }
+
+      #container {
+        width: 20%;
+        top: 0px;
+        position: absolute;
+        right: 20px;
+        height: 460px;
+        overflow-y: scroll;
+      }
+
+      .draggable {
+        cursor: pointer;
+      }
+
+      #droppable {
+        width: 75%;
+        float: left;
+        height: 100vh;
+        background-image: url(Dinos_background1.jpg);
+        background-size: cover;
+        position: relative;
+      }
+
+      #droppable .draggable {
+        position: absolute;
+      }
+
+      #droppable .dropped {
+        position: absolute;
+        width: 25%;
+        transition: all 0.1s;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="builder-container">
+      <div id="droppable" class="ui-widget-header"></div>
+
+      <div id="container">
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+        <div class="draggable"><img src="dino.png" alt="" /></div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="jquery.ui.touch-punch.min.js"></script>
+    <script>
+      $(function () {
+        $('.draggable').draggable({
+          cursor: 'grabbing',
+          containment: 'body',
+          appendTo: 'body',
+          helper: 'clone',
+        })
+
+        $('#droppable').droppable({
+          accept: '.draggable',
+          drop: function (event, ui) {
+            if (!ui.draggable.hasClass('dropped')) {
+              var draggableClone = ui.draggable.clone()
+              $(this).append(draggableClone)
+              var droppableOffset = $(this).offset()
+              var draggableOffset = ui.helper.offset()
+              var topPercent = ((draggableOffset.top - droppableOffset.top) / $(this).height()) * 100
+              var leftPercent = ((draggableOffset.left - droppableOffset.left) / $(this).width()) * 100
+              draggableClone.css({ top: topPercent + '%', left: leftPercent + '%' })
+              draggableClone.addClass('dropped')
+
+              draggableClone.draggable({
+                cursor: 'grabbing',
+                helper: 'original',
+                containment: '#droppable',
+                stop: function (event, ui) {
+                  var droppableOffset = $('#droppable').offset()
+                  var draggableOffset = ui.helper.offset()
+                  var topPercent = ((draggableOffset.top - droppableOffset.top) / $('#droppable').height()) * 100
+                  var leftPercent = ((draggableOffset.left - droppableOffset.left) / $('#droppable').width()) * 100
+                  ui.helper.css({ top: topPercent + '%', left: leftPercent + '%' })
+                },
+                drop: function (event, ui) {
+                  $(ui.draggable).remove()
+                },
+              })
+            }
+          },
+        })
+      })
+    </script>
+  </body>
+</html>
